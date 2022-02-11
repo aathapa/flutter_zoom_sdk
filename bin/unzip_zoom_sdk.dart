@@ -36,12 +36,15 @@ void main(List<String> args) async {
   if (!isNewFlutter)
     location = location.replaceFirst("/bin/unzip_zoom_sdk.dart", "");
 
-  await checkAndDownloadSDK(location);
+  await checkAndDownloadSDK(location, isDev: args.contains('dev'));
 
   print('Complete');
 }
 
-Future<void> checkAndDownloadSDK(String location) async {
+Future<void> checkAndDownloadSDK(
+  String location, {
+  bool isDev = false,
+}) async {
   var iosSDKFile = location +
       '/ios/MobileRTC.xcframework/ios-arm64_armv7/MobileRTC.framework/MobileRTC';
   bool exists = await File(iosSDKFile).exists();
@@ -52,14 +55,16 @@ Future<void> checkAndDownloadSDK(String location) async {
         iosSDKFile);
   }
 
-  var iosSimulateSDKFile = location +
-      '/ios/MobileRTC.xcframework/ios-i386_x86_64-simulator/MobileRTC.framework/MobileRTC';
-  exists = await File(iosSimulateSDKFile).exists();
+  if (isDev) {
+    var iosSimulateSDKFile = location +
+        '/ios/MobileRTC.xcframework/ios-i386_x86_64-simulator/MobileRTC.framework/MobileRTC';
+    exists = await File(iosSimulateSDKFile).exists();
 
-  if (!exists) {
-    await downloadFile(
-        Uri.parse('https://www.dropbox.com/s/alk03qxiolurxf8/MobileRTC?dl=1'),
-        iosSimulateSDKFile);
+    if (!exists) {
+      await downloadFile(
+          Uri.parse('https://www.dropbox.com/s/alk03qxiolurxf8/MobileRTC?dl=1'),
+          iosSimulateSDKFile);
+    }
   }
 
   var androidCommonLibFile = location + '/android/libs/commonlib.aar';
